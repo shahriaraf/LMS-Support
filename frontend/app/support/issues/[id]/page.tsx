@@ -2,8 +2,22 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import { Lightbulb, Search, Wrench, CheckCircle2, Terminal } from 'lucide-react';
 import { api } from '../../../../lib/api';
 import { Issue } from '../../../../lib/types';
+
+const SEVERITY_BADGE: Record<string, string> = {
+  low: 'badge-neutral',
+  medium: 'badge-warn',
+  high: 'badge-danger',
+  critical: 'badge-danger',
+};
+
+const STATUS_BADGE: Record<string, string> = {
+  open: 'badge-danger',
+  investigating: 'badge-warn',
+  resolved: 'badge-ok',
+};
 
 export default function IssueDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -43,9 +57,9 @@ export default function IssueDetailPage() {
       setMessage(
         applyFix
           ? res.fixApplied
-            ? 'Fix applied and ticket resolved - the underlying toggle has been flipped live.'
-            : 'Ticket resolved, but there was nothing automatic to apply for this category.'
-          : 'Ticket marked resolved (no automatic fix applied).',
+            ? 'Fix applied and ticket resolved — the underlying toggle has been flipped live.'
+            : 'Ticket resolved. There was nothing automatic to apply for this category.'
+          : 'Ticket marked resolved. No automatic fix was applied.',
       );
       await load();
     } finally {
@@ -53,72 +67,92 @@ export default function IssueDetailPage() {
     }
   }
 
-  if (!issue) return <p className="text-gray-500">Loading…</p>;
+  if (!issue) return <p className="text-sm text-ui-faint">Loading…</p>;
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div className="card p-5 space-y-2">
+    <div className="space-y-5 max-w-3xl">
+      <div className="surface p-6 space-y-3">
         <div className="flex items-center gap-2">
-          <span className="badge bg-gray-600/30 text-gray-300">{issue.category}</span>
-          <span className="badge bg-gray-600/30 text-gray-300">{issue.status}</span>
-          <span className="badge bg-warn/20 text-warn">{issue.severity}</span>
+          <span className="badge badge-neutral">{issue.category}</span>
+          <span className={`badge ${STATUS_BADGE[issue.status]}`}>
+            <span className="badge-dot" />
+            {issue.status}
+          </span>
+          <span className={`badge ${SEVERITY_BADGE[issue.severity]}`}>{issue.severity}</span>
         </div>
-        <h1 className="text-xl font-bold">{issue.title}</h1>
-        <p className="text-gray-400 text-sm">{issue.description}</p>
-        <p className="text-xs text-gray-600">
-          Reported by user {issue.reporterId} on {new Date(issue.createdAt).toLocaleString()}
+        <h1 className="text-lg font-display font-semibold">{issue.title}</h1>
+        <p className="text-sm text-ui-muted leading-relaxed">{issue.description}</p>
+        <p className="text-xs text-ui-faint font-mono pt-1">
+          reported by {issue.reporterId} on {new Date(issue.createdAt).toLocaleString()}
           {issue.relatedCourseId && <> · course {issue.relatedCourseId}</>}
         </p>
       </div>
 
-      <div className="card p-5 space-y-3">
-        <h2 className="font-semibold">Suggested Fix</h2>
-        <p className="text-sm text-gray-300 font-medium">{issue.suggestedFix.title}</p>
-        <p className="text-sm text-gray-500">
-          <span className="text-gray-400">Likely root cause: </span>
+      <div className="surface rail rail-signal p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Lightbulb size={15} className="text-signal" />
+          <h2 className="font-display font-semibold text-sm">Suggested fix</h2>
+        </div>
+        <p className="text-sm font-medium">{issue.suggestedFix.title}</p>
+        <p className="text-sm text-ui-muted leading-relaxed">
+          <span className="text-ui-faint">Likely root cause — </span>
           {issue.suggestedFix.likelyRootCause}
         </p>
         <div>
-          <p className="text-sm text-gray-400 mb-1">Investigation steps:</p>
-          <ol className="list-decimal list-inside text-sm text-gray-300 space-y-1">
+          <p className="text-xs uppercase tracking-wide font-mono text-ui-faint mb-2">Investigation steps</p>
+          <ol className="space-y-2">
             {issue.suggestedFix.steps.map((s, i) => (
-              <li key={i}>{s}</li>
+              <li key={i} className="flex gap-2.5 text-sm text-ui-muted">
+                <span className="font-mono text-signal shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                {s}
+              </li>
             ))}
           </ol>
         </div>
-        <p className="text-xs text-gray-600 font-mono">Relevant log query: {issue.suggestedFix.relevantLogQuery}</p>
+        <p className="flex items-center gap-2 text-xs font-mono text-ui-faint pt-2 border-t border-line">
+          <Terminal size={12} />
+          {issue.suggestedFix.relevantLogQuery}
+        </p>
       </div>
 
       {issue.status !== 'resolved' && (
-        <div className="card p-5 space-y-3">
-          <h2 className="font-semibold">Resolve</h2>
+        <div className="surface p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <Wrench size={15} className="text-ui-muted" />
+            <h2 className="font-display font-semibold text-sm">Resolve</h2>
+          </div>
           {issue.status === 'open' && (
-            <button className="btn-secondary text-sm" onClick={() => setStatus('investigating')} disabled={busy}>
+            <button className="btn btn-secondary btn-sm" onClick={() => setStatus('investigating')} disabled={busy}>
+              <Search size={13} />
               Mark as investigating
             </button>
           )}
           <div>
-            <label className="text-sm text-gray-400">Resolution notes</label>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
+            <label className="field-label">Resolution notes</label>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="What did you check, and what fixed it?" />
           </div>
           <div className="flex gap-2">
-            <button className="btn-primary text-sm" onClick={() => resolve(true)} disabled={busy}>
-              Resolve &amp; Apply Fix
+            <button className="btn btn-primary btn-sm" onClick={() => resolve(true)} disabled={busy}>
+              <CheckCircle2 size={14} />
+              Resolve &amp; apply fix
             </button>
-            <button className="btn-secondary text-sm" onClick={() => resolve(false)} disabled={busy}>
+            <button className="btn btn-secondary btn-sm" onClick={() => resolve(false)} disabled={busy}>
               Resolve without auto-fix
             </button>
           </div>
-          {message && <p className="text-ok text-sm">{message}</p>}
+          {message && <p className="text-sm text-ok">{message}</p>}
         </div>
       )}
 
       {issue.status === 'resolved' && (
-        <div className="card p-5">
-          <p className="text-ok font-medium">Resolved</p>
-          {issue.resolutionNotes && <p className="text-sm text-gray-400 mt-1">{issue.resolutionNotes}</p>}
+        <div className="surface rail rail-ok p-6">
+          <p className="flex items-center gap-1.5 text-sm font-medium text-ok">
+            <CheckCircle2 size={15} />
+            Resolved
+          </p>
+          {issue.resolutionNotes && <p className="text-sm text-ui-muted mt-2">{issue.resolutionNotes}</p>}
           {issue.resolvedAt && (
-            <p className="text-xs text-gray-600 mt-2">at {new Date(issue.resolvedAt).toLocaleString()}</p>
+            <p className="text-xs text-ui-faint font-mono mt-2">at {new Date(issue.resolvedAt).toLocaleString()}</p>
           )}
         </div>
       )}

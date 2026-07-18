@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Flag, CheckCircle2, X } from 'lucide-react';
 import { api, ApiError } from '../lib/api';
 import { IssueCategory } from '../lib/types';
 
@@ -46,7 +47,8 @@ export default function ReportIssueButton({
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="btn-secondary text-sm">
+      <button onClick={() => setOpen(true)} className="btn btn-secondary btn-sm">
+        <Flag size={13} />
         {label}
       </button>
     );
@@ -54,16 +56,35 @@ export default function ReportIssueButton({
 
   if (done) {
     return (
-      <div className="card p-4 text-sm text-ok">
-        Thanks - your report was filed and a support engineer can see it in the dashboard now.
+      <div className="surface p-4 flex items-start gap-3">
+        <span className="icon-chip tint-ok mt-0.5">
+          <CheckCircle2 size={15} />
+        </span>
+        <div>
+          <p className="text-sm font-medium">Report filed</p>
+          <p className="text-sm text-ui-muted mt-0.5">
+            A support engineer can see this ticket now, with a suggested fix attached automatically.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <form onSubmit={submit} className="card p-4 space-y-3">
+    <form onSubmit={submit} className="surface p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium">Report a problem</p>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="text-ui-faint hover:text-ui-text"
+          aria-label="Close"
+        >
+          <X size={15} />
+        </button>
+      </div>
       <div>
-        <label className="text-sm text-gray-400">What went wrong?</label>
+        <label className="field-label">What went wrong</label>
         <select value={category} onChange={(e) => setCategory(e.target.value as IssueCategory)}>
           {Object.entries(CATEGORY_LABELS).map(([value, text]) => (
             <option key={value} value={value}>
@@ -73,24 +94,25 @@ export default function ReportIssueButton({
         </select>
       </div>
       <div>
-        <label className="text-sm text-gray-400">Title</label>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} required />
+        <label className="field-label">Title</label>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="Short summary" />
       </div>
       <div>
-        <label className="text-sm text-gray-400">Describe what happened</label>
+        <label className="field-label">What happened</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
           rows={3}
+          placeholder="Steps to reproduce, what you expected, what you saw instead"
         />
       </div>
-      {error && <p className="text-danger text-sm">{error}</p>}
-      <div className="flex gap-2">
-        <button className="btn-primary text-sm" disabled={submitting}>
+      {error && <p className="text-sm text-danger">{error}</p>}
+      <div className="flex gap-2 pt-1">
+        <button className="btn btn-primary btn-sm" disabled={submitting}>
           {submitting ? 'Submitting…' : 'Submit report'}
         </button>
-        <button type="button" className="btn-secondary text-sm" onClick={() => setOpen(false)}>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setOpen(false)}>
           Cancel
         </button>
       </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { GraduationCap, CheckCircle2 } from 'lucide-react';
 import { api, ApiError } from '../../../../lib/api';
 
 interface QuizQuestion {
@@ -54,29 +55,34 @@ export default function QuizPage() {
     }
   }
 
-  if (error) return <p className="text-danger">{error}</p>;
-  if (!quizzes) return <p className="text-gray-500">Loading…</p>;
-  if (quizzes.length === 0) return <p className="text-gray-500">No quiz available for this course yet.</p>;
+  if (error) return <p className="text-sm text-danger">{error}</p>;
+  if (!quizzes) return <p className="text-sm text-ui-faint">Loading…</p>;
+  if (quizzes.length === 0) return <p className="text-sm text-ui-faint">No quiz available for this course yet.</p>;
 
   return (
     <div className="space-y-8 max-w-2xl">
-      <h1 className="text-2xl font-bold">Quiz</h1>
+      <div className="flex items-center gap-2">
+        <GraduationCap size={18} className="text-signal" />
+        <h1 className="text-xl font-display font-semibold">Quiz</h1>
+      </div>
       {quizzes.map((quiz) => (
-        <div key={quiz._id} className="card p-5 space-y-5">
+        <div key={quiz._id} className="surface p-6 space-y-6">
           {quiz.questions.map((q, qi) => (
             <div key={qi}>
-              <p className="font-medium mb-2">
+              <p className="font-medium text-sm mb-2.5">
                 {qi + 1}. {q.question}
               </p>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {q.options.map((opt, oi) => (
-                  <label key={oi} className="flex items-center gap-2 text-sm text-gray-300">
+                  <label
+                    key={oi}
+                    className="flex items-center gap-2.5 text-sm text-ui-muted hover:text-ui-text cursor-pointer"
+                  >
                     <input
                       type="radio"
                       name={`${quiz._id}-${qi}`}
                       checked={answers[quiz._id]?.[qi] === oi}
                       onChange={() => setAnswer(quiz._id, qi, oi)}
-                      className="w-auto"
                     />
                     {opt}
                   </label>
@@ -84,12 +90,17 @@ export default function QuizPage() {
               </div>
             </div>
           ))}
-          <button className="btn-primary" onClick={() => submit(quiz)} disabled={submitting}>
-            {submitting ? 'Submitting…' : 'Submit quiz'}
-          </button>
-          {result?.quizId === quiz._id && (
-            <p className="text-ok font-semibold">Score: {result.scorePercent}%</p>
-          )}
+          <div className="flex items-center gap-3 pt-1">
+            <button className="btn btn-primary" onClick={() => submit(quiz)} disabled={submitting}>
+              {submitting ? 'Submitting…' : 'Submit quiz'}
+            </button>
+            {result?.quizId === quiz._id && (
+              <span className="flex items-center gap-1.5 text-sm font-medium text-ok">
+                <CheckCircle2 size={15} />
+                Score: {result.scorePercent}%
+              </span>
+            )}
+          </div>
         </div>
       ))}
     </div>

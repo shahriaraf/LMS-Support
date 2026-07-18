@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { API_URL } from '../lib/api';
 import ReportIssueButton from './ReportIssueButton';
 
@@ -42,8 +43,8 @@ export default function VideoPlayer({ courseId }: Props) {
             status: 'error',
             message:
               err?.message === 'Failed to fetch'
-                ? 'Failed to fetch - open DevTools → Console to confirm, but this is almost always a CORS policy block on /video/:id/manifest.'
-                : err?.message || 'Video failed to load',
+                ? 'Failed to fetch. Open DevTools → Console to confirm — this is almost always a CORS policy block on /video/:id/manifest, not an outage.'
+                : err?.message || 'The video failed to load.',
           });
         }
       }
@@ -55,14 +56,24 @@ export default function VideoPlayer({ courseId }: Props) {
   }, [courseId]);
 
   if (state.status === 'loading') {
-    return <div className="aspect-video card flex items-center justify-center text-gray-500">Loading video…</div>;
+    return (
+      <div className="aspect-video surface flex items-center justify-center gap-2 text-sm text-ui-faint">
+        <Loader2 size={16} className="animate-spin" />
+        Loading video…
+      </div>
+    );
   }
 
   if (state.status === 'error') {
     return (
-      <div className="aspect-video card flex flex-col items-center justify-center gap-3 p-6 text-center">
-        <p className="text-danger font-semibold">⚠ Video failed to load</p>
-        <p className="text-sm text-gray-400 max-w-md">{state.message}</p>
+      <div className="aspect-video surface rail rail-danger flex flex-col items-center justify-center gap-3 p-8 text-center">
+        <span className="icon-chip tint-danger">
+          <AlertTriangle size={16} />
+        </span>
+        <div>
+          <p className="font-medium">Video failed to load</p>
+          <p className="text-sm text-ui-muted mt-1 max-w-md">{state.message}</p>
+        </div>
         <ReportIssueButton defaultCategory="VIDEO_CORS" relatedCourseId={courseId} label="Report this video issue" />
       </div>
     );
@@ -71,12 +82,13 @@ export default function VideoPlayer({ courseId }: Props) {
   return (
     <div>
       {state.corsSimulated && (
-        <p className="text-xs text-warn mb-2">
-          Note: CORS simulation is currently OFF-path (this request succeeded), but the toggle is on -
-          your environment may be same-origin. Ask support to check Settings.
+        <p className="flex items-center gap-1.5 text-xs text-warn mb-2">
+          <AlertTriangle size={12} />
+          CORS simulation is enabled but this request still succeeded — likely a same-origin dev setup.
+          Confirm the toggle state in Support → Settings.
         </p>
       )}
-      <video controls className="w-full aspect-video rounded-lg bg-black" src={state.videoUrl} />
+      <video controls className="w-full aspect-video rounded-md bg-black" src={state.videoUrl} />
     </div>
   );
 }

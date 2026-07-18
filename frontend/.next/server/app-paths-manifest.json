@@ -1,10 +1,9 @@
 {
-  "/login/page": "app/login/page.js",
-  "/support/page": "app/support/page.js",
-  "/support/settings/page": "app/support/settings/page.js",
-  "/support/issues/page": "app/support/issues/page.js",
-  "/support/browser-check/page": "app/support/browser-check/page.js",
-  "/support/logs/page": "app/support/logs/page.js",
+  "/page": "app/page.js",
+  "/courses/page": "app/courses/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/support/payments/page": "app/support/payments/page.js",
   "/support/courses/page": "app/support/courses/page.js",
-  "/support/payments/page": "app/support/payments/page.js"
+  "/support/page": "app/support/page.js",
+  "/support/issues/page": "app/support/issues/page.js"
 }

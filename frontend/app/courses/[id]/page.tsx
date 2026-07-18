@@ -3,8 +3,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { ShieldAlert, GraduationCap, LogIn } from 'lucide-react';
 import { api, ApiError } from '../../../lib/api';
-import { Course, Enrollment, Settings } from '../../../lib/types';
+import { Course, Enrollment } from '../../../lib/types';
 import { useAuth } from '../../../lib/auth-context';
 import VideoPlayer from '../../../components/VideoPlayer';
 import PaymentForm from '../../../components/PaymentForm';
@@ -29,11 +30,7 @@ export default function CourseDetailPage() {
       const c = await api.get<Course>(`/courses/${id}`);
       setCourse(c);
     } catch (err) {
-      if (err instanceof ApiError && err.status === 403) {
-        setForbidden(err.message);
-      } else {
-        setForbidden(err instanceof ApiError ? err.message : 'Failed to load course');
-      }
+      setForbidden(err instanceof ApiError ? err.message : 'Failed to load course');
     } finally {
       setLoading(false);
     }
@@ -75,23 +72,29 @@ export default function CourseDetailPage() {
 
   if (!user) {
     return (
-      <div className="card p-6 text-center">
-        <p className="mb-4">Log in to view this course.</p>
-        <Link href="/login" className="btn-primary">
+      <div className="surface p-8 text-center max-w-sm mx-auto mt-8">
+        <span className="icon-chip tint-signal mx-auto mb-3">
+          <LogIn size={15} />
+        </span>
+        <p className="text-sm text-ui-muted mb-4">Log in to view this course.</p>
+        <Link href="/login" className="btn btn-primary">
           Log in
         </Link>
       </div>
     );
   }
 
-  if (loading) return <p className="text-gray-500">Loading…</p>;
+  if (loading) return <p className="text-sm text-ui-faint">Loading…</p>;
 
   if (forbidden) {
     return (
-      <div className="card p-6 space-y-4">
-        <p className="badge bg-danger/20 text-danger">403 Forbidden</p>
-        <h1 className="text-xl font-bold">This course isn&apos;t accessible right now</h1>
-        <p className="text-sm text-gray-400">{forbidden}</p>
+      <div className="surface rail rail-danger p-6 space-y-4 max-w-lg">
+        <span className="badge badge-danger">
+          <span className="badge-dot" />
+          403 Forbidden
+        </span>
+        <h1 className="text-lg font-display font-semibold">This course isn&rsquo;t accessible right now</h1>
+        <p className="text-sm text-ui-muted">{forbidden}</p>
         <ReportIssueButton
           defaultCategory="COURSE_403"
           relatedCourseId={typeof id === 'string' ? id : undefined}
@@ -101,24 +104,28 @@ export default function CourseDetailPage() {
     );
   }
 
-  if (!course) return <p className="text-danger">Course not found.</p>;
+  if (!course) return <p className="text-sm text-danger">Course not found.</p>;
 
   const isActive = enrollment?.status === 'active';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold">{course.title}</h1>
-        <p className="text-gray-400 mt-1">{course.description}</p>
-        <p className="text-sm text-gray-500 mt-2">
-          Instructor: {course.instructor} · {course.priceCents === 0 ? 'Free' : `$${(course.priceCents / 100).toFixed(2)}`}
+        <h1 className="text-2xl font-display font-semibold">{course.title}</h1>
+        <p className="text-ui-muted mt-2 text-[15px] leading-relaxed">{course.description}</p>
+        <p className="text-sm text-ui-faint mt-3">
+          Taught by {course.instructor} ·{' '}
+          <span className="font-mono text-ui-muted">
+            {course.priceCents === 0 ? 'Free' : `$${(course.priceCents / 100).toFixed(2)}`}
+          </span>
         </p>
       </div>
 
       {isActive ? (
         <>
           <VideoPlayer courseId={course._id} />
-          <Link href={`/dashboard/quiz/${course._id}`} className="btn-primary inline-block">
+          <Link href={`/dashboard/quiz/${course._id}`} className="btn btn-primary inline-flex">
+            <GraduationCap size={15} />
             Take the quiz
           </Link>
         </>
@@ -127,14 +134,17 @@ export default function CourseDetailPage() {
           <button
             onClick={handleFreeEnroll}
             disabled={enrolling}
-            className={cssBug ? 'btn-primary enroll-btn-bug' : 'btn-primary enroll-btn-fixed'}
+            className={`btn btn-primary ${cssBug ? 'enroll-btn-bug' : 'enroll-btn-fixed'}`}
           >
             {enrolling ? 'Enrolling…' : 'Enroll for free'}
           </button>
           {enrollError && (
-            <div className="bg-danger/10 border border-danger/40 rounded-lg p-3 space-y-2 max-w-md">
-              <p className="text-danger text-sm font-medium">Enrollment failed</p>
-              <p className="text-xs text-gray-400">{enrollError}</p>
+            <div className="tint-danger rounded-md p-3 space-y-2 max-w-md">
+              <p className="flex items-center gap-1.5 text-sm font-medium">
+                <ShieldAlert size={14} />
+                Enrollment failed
+              </p>
+              <p className="text-xs opacity-90">{enrollError}</p>
               <ReportIssueButton
                 defaultCategory="ENROLLMENT_DB_ERROR"
                 relatedCourseId={course._id}
@@ -147,7 +157,15 @@ export default function CourseDetailPage() {
         <PaymentForm
           courseId={course._id}
           amountCents={course.priceCents}
-          onSuccess={() => setEnrollment({ _id: 'local', userId: user.id, courseId: course._id, status: 'active', createdAt: new Date().toISOString() })}
+          onSuccess={() =>
+            setEnrollment({
+              _id: 'local',
+              userId: user.id,
+              courseId: course._id,
+              status: 'active',
+              createdAt: new Date().toISOString(),
+            })
+          }
         />
       )}
     </div>

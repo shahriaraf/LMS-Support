@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { LogIn } from 'lucide-react';
 import { useAuth } from '../../lib/auth-context';
 import { ApiError } from '../../lib/api';
 
@@ -28,24 +29,25 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto card p-6">
-      <h1 className="text-xl font-bold mb-4">Log in</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-sm mx-auto mt-6">
+      <div className="mb-6">
+        <span className="icon-chip tint-signal mb-3">
+          <LogIn size={15} />
+        </span>
+        <h1 className="text-xl font-display font-semibold">Log in</h1>
+        <p className="text-sm text-ui-muted mt-1">Access your courses or the support console.</p>
+      </div>
+      <form onSubmit={handleSubmit} className="surface p-6 space-y-4">
         <div>
-          <label className="text-sm text-gray-400">Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <label className="field-label">Email</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
         </div>
         <div>
-          <label className="text-sm text-gray-400">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <label className="field-label">Password</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
-        {error && <p className="text-danger text-sm">{error}</p>}
-        <button className="btn-primary w-full" disabled={loading}>
+        {error && <p className="text-sm text-danger">{error}</p>}
+        <button className="btn btn-primary w-full" disabled={loading}>
           {loading ? 'Logging in…' : 'Log in'}
         </button>
       </form>

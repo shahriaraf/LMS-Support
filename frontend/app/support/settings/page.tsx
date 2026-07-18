@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { SlidersHorizontal } from 'lucide-react';
 import { api } from '../../../lib/api';
 import { Settings } from '../../../lib/types';
 
@@ -22,22 +23,23 @@ export default function SupportSettingsPage() {
     }
   }
 
-  if (!settings) return <p className="text-gray-500">Loading…</p>;
+  if (!settings) return <p className="text-sm text-ui-faint">Loading…</p>;
 
   return (
     <div className="space-y-4 max-w-2xl">
-      <p className="text-sm text-gray-500">
-        These toggles control real backend behavior across the whole app. Course locks are per-course
-        and live on the Courses list instead of here.
+      <p className="text-sm text-ui-faint">
+        These toggles control real backend behavior across the whole app. Course locks are
+        per-course and live on the <span className="text-ui-muted">Courses</span> tab instead of
+        here.
       </p>
 
-      <div className="card p-5 space-y-3">
+      <div className="surface p-5 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium">Payment failure rate</p>
-            <p className="text-xs text-gray-500">Chance any payments/charge call randomly returns a 500.</p>
+            <p className="text-sm font-medium">Payment failure rate</p>
+            <p className="text-xs text-ui-faint mt-0.5">Chance any payments/charge call randomly returns a 500.</p>
           </div>
-          <span className="font-mono text-sm">{Math.round(settings.paymentFailureRate * 100)}%</span>
+          <span className="font-mono text-sm text-ui-text">{Math.round(settings.paymentFailureRate * 100)}%</span>
         </div>
         <input
           type="range"
@@ -50,7 +52,7 @@ export default function SupportSettingsPage() {
 
       <ToggleRow
         title="Video CORS error"
-        description="Omits Access-Control-Allow-Origin on the video manifest endpoint - genuinely blocked by the browser."
+        description="Omits Access-Control-Allow-Origin on the video manifest endpoint — genuinely blocked by the browser."
         value={settings.videoCorsErrorEnabled}
         onChange={(v) => update({ videoCorsErrorEnabled: v })}
         disabled={saving}
@@ -87,17 +89,26 @@ function ToggleRow({
   disabled: boolean;
 }) {
   return (
-    <div className="card p-5 flex items-center justify-between gap-4">
-      <div>
-        <p className="font-medium">{title}</p>
-        <p className="text-xs text-gray-500">{description}</p>
+    <div className={`surface rail ${value ? 'rail-warn' : 'rail-ok'} p-5 flex items-center justify-between gap-4`}>
+      <div className="flex items-start gap-3">
+        <span className="icon-chip tint-neutral shrink-0 mt-0.5">
+          <SlidersHorizontal size={13} />
+        </span>
+        <div>
+          <p className="text-sm font-medium">{title}</p>
+          <p className="text-xs text-ui-faint mt-0.5">{description}</p>
+        </div>
       </div>
       <button
+        role="switch"
+        aria-checked={value}
+        aria-label={title}
         onClick={() => onChange(!value)}
         disabled={disabled}
-        className={value ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
+        className="switch shrink-0"
+        data-on={value}
       >
-        {value ? 'Enabled (bug ON)' : 'Disabled (bug OFF)'}
+        <span className="switch-knob" />
       </button>
     </div>
   );

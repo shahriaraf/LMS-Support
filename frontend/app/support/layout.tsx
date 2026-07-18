@@ -2,29 +2,43 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  LayoutGrid,
+  Flag,
+  BookOpen,
+  ScrollText,
+  Receipt,
+  Monitor,
+  SlidersHorizontal,
+  LogIn,
+  ShieldOff,
+} from 'lucide-react';
 import { useAuth } from '../../lib/auth-context';
 
 const TABS = [
-  { href: '/support', label: 'Overview' },
-  { href: '/support/issues', label: 'Issues' },
-  { href: '/support/courses', label: 'Courses' },
-  { href: '/support/logs', label: 'Logs' },
-  { href: '/support/payments', label: 'Payments' },
-  { href: '/support/browser-check', label: 'Browser Check' },
-  { href: '/support/settings', label: 'Settings' },
+  { href: '/support', label: 'Overview', icon: LayoutGrid },
+  { href: '/support/issues', label: 'Issues', icon: Flag },
+  { href: '/support/courses', label: 'Courses', icon: BookOpen },
+  { href: '/support/logs', label: 'Logs', icon: ScrollText },
+  { href: '/support/payments', label: 'Payments', icon: Receipt },
+  { href: '/support/browser-check', label: 'Browser check', icon: Monitor },
+  { href: '/support/settings', label: 'Settings', icon: SlidersHorizontal },
 ];
 
 export default function SupportLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const pathname = usePathname();
 
-  if (loading) return <p className="text-gray-500">Loading…</p>;
+  if (loading) return <p className="text-sm text-ui-faint">Loading…</p>;
 
   if (!user) {
     return (
-      <div className="card p-6 text-center">
-        <p className="mb-4">Log in with a support_engineer account to access this dashboard.</p>
-        <Link href="/login" className="btn-primary">
+      <div className="surface p-8 text-center max-w-sm mx-auto mt-8">
+        <span className="icon-chip tint-signal mx-auto mb-3">
+          <LogIn size={15} />
+        </span>
+        <p className="text-sm text-ui-muted mb-4">Log in with a support engineer account to access this console.</p>
+        <Link href="/login" className="btn btn-primary">
           Log in
         </Link>
       </div>
@@ -33,8 +47,14 @@ export default function SupportLayout({ children }: { children: React.ReactNode 
 
   if (user.role !== 'support_engineer' && user.role !== 'admin') {
     return (
-      <div className="card p-6 text-center">
-        <p>Your account ({user.role}) doesn&apos;t have access to the Support Dashboard.</p>
+      <div className="surface rail rail-danger p-8 text-center max-w-sm mx-auto mt-8">
+        <span className="icon-chip tint-danger mx-auto mb-3">
+          <ShieldOff size={15} />
+        </span>
+        <p className="text-sm text-ui-muted">
+          Your account (<span className="font-mono text-ui-text">{user.role}</span>) doesn&rsquo;t have access to
+          the support console.
+        </p>
       </div>
     );
   }
@@ -42,22 +62,26 @@ export default function SupportLayout({ children }: { children: React.ReactNode 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Support Engineer Dashboard</h1>
-        <p className="text-gray-500 text-sm">Live view of real backend state - nothing here is a screenshot.</p>
+        <h1 className="text-xl font-display font-semibold">Support console</h1>
+        <p className="text-sm text-ui-faint mt-1">Live backend state — nothing on this page is a screenshot.</p>
       </div>
-      <div className="flex gap-2 border-b border-[#262b38] pb-2 flex-wrap">
-        {TABS.map((t) => (
-          <Link
-            key={t.href}
-            href={t.href}
-            className={
-              'px-3 py-1.5 rounded-md text-sm ' +
-              (pathname === t.href ? 'bg-accent text-white' : 'text-gray-400 hover:text-white')
-            }
-          >
-            {t.label}
-          </Link>
-        ))}
+      <div className="flex gap-1 border-b border-line overflow-x-auto">
+        {TABS.map((t) => {
+          const active = pathname === t.href;
+          return (
+            <Link
+              key={t.href}
+              href={t.href}
+              className={
+                'flex items-center gap-1.5 px-3 py-2 text-sm border-b-2 -mb-px whitespace-nowrap transition-colors ' +
+                (active ? 'border-signal text-ui-text' : 'border-transparent text-ui-muted hover:text-ui-text')
+              }
+            >
+              <t.icon size={14} />
+              {t.label}
+            </Link>
+          );
+        })}
       </div>
       {children}
     </div>

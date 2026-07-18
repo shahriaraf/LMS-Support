@@ -2,91 +2,402 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   Design tokens
+   Palette grounded in the product's own subject matter: an engineering
+   support console. "Signal" teal is the interactive/brand color (distinct
+   from the semantic status hues so the two never compete). Status colors
+   follow the incident-tooling convention (ok / warn / danger) because that
+   convention is exactly what this product's users already read fluently.
+   ========================================================================== */
+:root {
+  --ink: #0a0d12;
+  --surface: #12161d;
+  --surface-2: #171c25;
+  --surface-3: #1c222c;
+  --line: #232935;
+  --line-soft: #1a2029;
+
+  --text: #e7eaf0;
+  --text-muted: #8d95a8;
+  --text-faint: #566072;
+
+  --signal: #2dd4bf;
+  --signal-strong: #45e6d1;
+  --signal-ink: #04211d;
+
+  --ok: #34d399;
+  --ok-bg: rgba(52, 211, 153, 0.12);
+  --warn: #f2a93b;
+  --warn-bg: rgba(242, 169, 59, 0.12);
+  --danger: #f0574c;
+  --danger-bg: rgba(240, 87, 76, 0.12);
+  --neutral-bg: rgba(141, 149, 168, 0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
 html,
 body {
-  background-color: #0f1115;
-  color: #e6e7eb;
+  background-color: var(--ink);
+  color: var(--text);
 }
 
 * {
   box-sizing: border-box;
 }
 
-.card {
-  background-color: #161922;
-  border: 1px solid #262b38;
-  border-radius: 0.75rem;
+body {
+  font-family: var(--font-body);
+  font-feature-settings: 'ss01' 1, 'cv01' 1;
+  -webkit-font-smoothing: antialiased;
 }
 
-.badge {
+::selection {
+  background-color: var(--signal);
+  color: var(--signal-ink);
+}
+
+/* Visible keyboard focus everywhere - never suppressed. */
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+code,
+kbd,
+.font-mono-ui {
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   Layout primitives
+   ========================================================================== */
+.surface {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+a.card:hover,
+.card-interactive:hover {
+  border-color: #2e3644;
+  background-color: var(--surface-2);
+}
+
+/* Signature element: a status rail. A 3px colored left border communicates
+   state at a glance across every list in the product - course lock state,
+   issue severity, log outcome, payment result - the same visual grammar
+   used consistently everywhere state is the point of the row. */
+.rail {
+  border-left: 3px solid var(--line);
+}
+.rail-ok {
+  border-left-color: var(--ok);
+}
+.rail-warn {
+  border-left-color: var(--warn);
+}
+.rail-danger {
+  border-left-color: var(--danger);
+}
+.rail-signal {
+  border-left-color: var(--signal);
+}
+.rail-neutral {
+  border-left-color: var(--text-faint);
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.15rem 0.6rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
   font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
 }
-
-.btn-primary {
-  background-color: #6366f1;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  transition: background-color 0.15s ease;
-}
-.btn-primary:hover {
-  background-color: #4f46e5;
-}
-.btn-primary:disabled {
+.btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.btn-secondary {
-  background-color: #262b38;
-  color: #e6e7eb;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
+.btn-primary {
+  background-color: var(--signal);
+  color: var(--signal-ink);
 }
-.btn-secondary:hover {
-  background-color: #313746;
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--signal-strong);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.btn-secondary:hover:not(:disabled) {
+  border-color: #363e4d;
+  background-color: var(--surface-2);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--text-muted);
+  padding: 0.5rem 0.75rem;
+}
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+  background-color: var(--surface-2);
+}
+
+.btn-danger {
+  background-color: transparent;
+  color: var(--danger);
+  border: 1px solid rgba(240, 87, 76, 0.35);
+}
+.btn-danger:hover:not(:disabled) {
+  background-color: var(--danger-bg);
+}
+
+.btn-sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+/* ==========================================================================
+   Form controls
+   ========================================================================== */
+.field-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
 }
 
 input,
 textarea,
 select {
-  background-color: #0f1115;
-  border: 1px solid #262b38;
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  color: #e6e7eb;
+  background-color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.75rem;
+  color: var(--text);
   width: 100%;
+  font-size: 0.9rem;
+  transition: border-color 0.15s ease;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-faint);
 }
 input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: #6366f1;
+  border-color: var(--signal);
+}
+input[type='checkbox'],
+input[type='radio'] {
+  width: auto;
+  accent-color: var(--signal);
+}
+input[type='range'] {
+  accent-color: var(--signal);
+  padding: 0;
+  background: transparent;
+  border: none;
 }
 
-/*
- * SIMULATED BUG - "Button misaligned -> CSS issue".
- * When the backend's cssMisalignmentBugEnabled flag is true, components
- * apply this class instead of the correct alignment utilities. This is a
- * genuine CSS regression (negative margin + baseline align), not a fake
- * screenshot - the Support Dashboard flips a real toggle to fix it.
- */
+/* ==========================================================================
+   Status badges - mono, uppercase, tracked, with a dot rather than color
+   alone (color-blind-safe: the label text always says the state too).
+   ========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.badge-ok {
+  background-color: var(--ok-bg);
+  color: var(--ok);
+}
+.badge-ok .badge-dot {
+  background-color: var(--ok);
+}
+.badge-warn {
+  background-color: var(--warn-bg);
+  color: var(--warn);
+}
+.badge-warn .badge-dot {
+  background-color: var(--warn);
+}
+.badge-danger {
+  background-color: var(--danger-bg);
+  color: var(--danger);
+}
+.badge-danger .badge-dot {
+  background-color: var(--danger);
+}
+.badge-neutral {
+  background-color: var(--neutral-bg);
+  color: var(--text-muted);
+}
+.badge-neutral .badge-dot {
+  background-color: var(--text-faint);
+}
+.badge-signal {
+  background-color: rgba(45, 212, 191, 0.12);
+  color: var(--signal);
+}
+.badge-signal .badge-dot {
+  background-color: var(--signal);
+}
+
+/* ==========================================================================
+   Toggle switch (used in Support → Settings) - a real switch control
+   instead of a button that just relabels itself.
+   ========================================================================== */
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background-color: var(--line);
+  border: 1px solid var(--line);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.switch[data-on='true'] {
+  background-color: var(--signal);
+  border-color: var(--signal);
+}
+.switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background-color: var(--text);
+  transition: transform 0.15s ease;
+}
+.switch[data-on='true'] .switch-knob {
+  transform: translateX(18px);
+  background-color: var(--signal-ink);
+}
+
+/* ==========================================================================
+   Simulated CSS bug (Issue #4). Kept intentionally broken until the
+   Support Dashboard flips Settings.cssMisalignmentBugEnabled off.
+   ========================================================================== */
 .enroll-btn-bug {
   margin-left: -40px;
   vertical-align: text-top;
   transform: translateY(14px) rotate(-2deg);
 }
-
 .enroll-btn-fixed {
   margin-left: 0;
   vertical-align: middle;
   transform: none;
+}
+
+/* Tinted chips - used instead of Tailwind's bg-color/NN opacity modifier,
+   which doesn't resolve correctly against CSS-variable-backed tokens. */
+.tint-signal {
+  background-color: rgba(45, 212, 191, 0.12);
+  color: var(--signal);
+}
+.tint-ok {
+  background-color: var(--ok-bg);
+  color: var(--ok);
+}
+.tint-warn {
+  background-color: var(--warn-bg);
+  color: var(--warn);
+}
+.tint-danger {
+  background-color: var(--danger-bg);
+  color: var(--danger);
+}
+.tint-neutral {
+  background-color: var(--neutral-bg);
+  color: var(--text-muted);
+}
+
+.icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+/* Utility: sticky header blur */
+.header-blur {
+  background-color: rgba(10, 13, 18, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Utility: subtle divider list */
+.divide-line > * + * {
+  border-top: 1px solid var(--line);
 }

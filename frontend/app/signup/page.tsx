@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { UserPlus } from 'lucide-react';
 import { useAuth } from '../../lib/auth-context';
 import { ApiError } from '../../lib/api';
 
@@ -30,19 +31,25 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto card p-6">
-      <h1 className="text-xl font-bold mb-4">Create an account</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-sm mx-auto mt-6">
+      <div className="mb-6">
+        <span className="icon-chip tint-signal mb-3">
+          <UserPlus size={15} />
+        </span>
+        <h1 className="text-xl font-display font-semibold">Create an account</h1>
+        <p className="text-sm text-ui-muted mt-1">Set up a student or support engineer account.</p>
+      </div>
+      <form onSubmit={handleSubmit} className="surface p-6 space-y-4">
         <div>
-          <label className="text-sm text-gray-400">Name</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} required minLength={2} />
+          <label className="field-label">Name</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} required minLength={2} autoFocus />
         </div>
         <div>
-          <label className="text-sm text-gray-400">Email</label>
+          <label className="field-label">Email</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
-          <label className="text-sm text-gray-400">Password</label>
+          <label className="field-label">Password</label>
           <input
             type="password"
             value={password}
@@ -52,18 +59,18 @@ export default function SignupPage() {
           />
         </div>
         <div>
-          <label className="text-sm text-gray-400">Account type</label>
+          <label className="field-label">Account type</label>
           <select value={role} onChange={(e) => setRole(e.target.value as any)}>
             <option value="student">Student</option>
-            <option value="support_engineer">Support Engineer</option>
+            <option value="support_engineer">Support engineer</option>
           </select>
-          <p className="text-xs text-gray-500 mt-1">
-            Support Engineer accounts get access to the debugging dashboard. This is only exposed
-            client-side for this demo - never do this in a real product.
+          <p className="text-xs text-ui-faint mt-1.5">
+            Support engineer accounts unlock the debugging console. Exposed here only for this demo —
+            never let a client choose its own role in production.
           </p>
         </div>
-        {error && <p className="text-danger text-sm">{error}</p>}
-        <button className="btn-primary w-full" disabled={loading}>
+        {error && <p className="text-sm text-danger">{error}</p>}
+        <button className="btn btn-primary w-full" disabled={loading}>
           {loading ? 'Creating account…' : 'Sign up'}
         </button>
       </form>

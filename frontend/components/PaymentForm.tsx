@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AlertTriangle, CreditCard } from 'lucide-react';
 import { api, ApiError } from '../lib/api';
 import ReportIssueButton from './ReportIssueButton';
 
@@ -36,30 +37,39 @@ export default function PaymentForm({ courseId, amountCents, onSuccess }: Props)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card p-5 space-y-4 max-w-sm">
-      <h3 className="font-semibold">Checkout - ${(amountCents / 100).toFixed(2)}</h3>
+    <form onSubmit={handleSubmit} className="surface p-5 space-y-4 max-w-sm">
+      <div className="flex items-center gap-2">
+        <span className="icon-chip tint-signal">
+          <CreditCard size={14} />
+        </span>
+        <h3 className="font-display font-semibold">Checkout — ${(amountCents / 100).toFixed(2)}</h3>
+      </div>
       <div>
-        <label className="text-sm text-gray-400">Card number</label>
-        <input value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} required />
-        <p className="text-xs text-gray-600 mt-1">
-          Try <code>4000000000000002</code> to reliably reproduce a payment failure.
+        <label className="field-label">Card number</label>
+        <input value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} required inputMode="numeric" />
+        <p className="text-xs text-ui-faint mt-1.5">
+          Use <code className="font-mono text-ui-muted">4000000000000002</code> to reliably reproduce a
+          payment failure.
         </p>
       </div>
       <div className="flex gap-3">
         <div className="flex-1">
-          <label className="text-sm text-gray-400">Expiry</label>
-          <input value={expiry} onChange={(e) => setExpiry(e.target.value)} required />
+          <label className="field-label">Expiry</label>
+          <input value={expiry} onChange={(e) => setExpiry(e.target.value)} required placeholder="MM/YY" />
         </div>
         <div className="flex-1">
-          <label className="text-sm text-gray-400">CVC</label>
-          <input value={cvc} onChange={(e) => setCvc(e.target.value)} required />
+          <label className="field-label">CVC</label>
+          <input value={cvc} onChange={(e) => setCvc(e.target.value)} required inputMode="numeric" />
         </div>
       </div>
       {error && (
-        <div className="bg-danger/10 border border-danger/40 rounded-lg p-3 space-y-2">
-          <p className="text-danger text-sm font-medium">Payment failed (500)</p>
-          <p className="text-xs text-gray-400">{error.message}</p>
-          {error.providerRef && <p className="text-xs text-gray-600">Ref: {error.providerRef}</p>}
+        <div className="tint-danger rounded-md p-3 space-y-2">
+          <p className="flex items-center gap-1.5 text-sm font-medium">
+            <AlertTriangle size={14} />
+            Payment failed (500)
+          </p>
+          <p className="text-xs opacity-90">{error.message}</p>
+          {error.providerRef && <p className="text-xs font-mono opacity-70">ref: {error.providerRef}</p>}
           <ReportIssueButton
             defaultCategory="PAYMENT_FAILURE"
             relatedCourseId={courseId}
@@ -67,8 +77,8 @@ export default function PaymentForm({ courseId, amountCents, onSuccess }: Props)
           />
         </div>
       )}
-      <button className="btn-primary w-full" disabled={loading}>
-        {loading ? 'Processing…' : 'Pay & Enroll'}
+      <button className="btn btn-primary w-full" disabled={loading}>
+        {loading ? 'Processing…' : 'Pay & enroll'}
       </button>
     </form>
   );

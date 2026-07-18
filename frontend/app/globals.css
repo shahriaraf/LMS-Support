@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  background-color: #0f1115;
+  color: #e6e7eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.card {
+  background-color: #161922;
+  border: 1px solid #262b38;
+  border-radius: 0.75rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: #6366f1;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
+}
+.btn-primary:hover {
+  background-color: #4f46e5;
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: #262b38;
+  color: #e6e7eb;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+.btn-secondary:hover {
+  background-color: #313746;
+}
+
+input,
+textarea,
+select {
+  background-color: #0f1115;
+  border: 1px solid #262b38;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  color: #e6e7eb;
+  width: 100%;
+}
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+/*
+ * SIMULATED BUG - "Button misaligned -> CSS issue".
+ * When the backend's cssMisalignmentBugEnabled flag is true, components
+ * apply this class instead of the correct alignment utilities. This is a
+ * genuine CSS regression (negative margin + baseline align), not a fake
+ * screenshot - the Support Dashboard flips a real toggle to fix it.
+ */
+.enroll-btn-bug {
+  margin-left: -40px;
+  vertical-align: text-top;
+  transform: translateY(14px) rotate(-2deg);
+}
+
+.enroll-btn-fixed {
+  margin-left: 0;
+  vertical-align: middle;
+  transform: none;
+}

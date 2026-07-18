@@ -1,9 +1,7 @@
 {
-  "/page": "app/page.js",
-  "/courses/page": "app/courses/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/support/payments/page": "app/support/payments/page.js",
-  "/support/courses/page": "app/support/courses/page.js",
   "/support/page": "app/support/page.js",
-  "/support/issues/page": "app/support/issues/page.js"
+  "/support/issues/page": "app/support/issues/page.js",
+  "/support/settings/page": "app/support/settings/page.js",
+  "/support/courses/page": "app/support/courses/page.js",
+  "/support/logs/page": "app/support/logs/page.js"
 }

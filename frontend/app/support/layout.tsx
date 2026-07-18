@@ -65,7 +65,7 @@ export default function SupportLayout({ children }: { children: React.ReactNode 
         <h1 className="text-xl font-display font-semibold">Support console</h1>
         <p className="text-sm text-ui-faint mt-1">Live backend state — nothing on this page is a screenshot.</p>
       </div>
-      <div className="flex gap-1 border-b border-line overflow-x-auto">
+      <div className="flex gap-1 border-b border-line overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-ui-muted/20 scrollbar-track-ui-bg/0">
         {TABS.map((t) => {
           const active = pathname === t.href;
           return (
